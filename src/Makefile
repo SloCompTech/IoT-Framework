@@ -1,7 +1,7 @@
 LIB_DIR = ../lib
 INCLUDE_DIR = ../lib
-MAIN_CPP=Server.cpp
-OUTPUT_FILE=Server
+MAIN_CPP=Core.cpp
+OUTPUT_FILE=Core
 
 
 build:
