@@ -1,4 +1,7 @@
+LIB_DIR = ../
+INCLUDE_DIR = ../
+
 MAIN_FILE=TCPClient.cpp
 
 all:
-	g++ -c $(MAIN_FILE) -std=c++11
+	g++ -c $(MAIN_FILE) -L $(LIB_DIR) -I $(INCLUDE_DIR) -std=c++11

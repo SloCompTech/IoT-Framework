@@ -11,6 +11,7 @@
 #include <unistd.h>
 
 #include <SocketManip/SocketManip.h>
+#include <Convert/Convert.h>
 
 #ifdef OS_LINUX
   #include <netinet/in.h>
@@ -25,11 +26,12 @@ using namespace std;
 class TCPClient
 {
   public:
-
+    TCPClient();
     ~TCPClient();
 
     bool setBlocking(bool pBlocking);
     string getAddress();
+    int getPort();
 
     bool isValid();
     bool isOpened();
@@ -50,9 +52,8 @@ class TCPClient
   private:
     int obj_socket;
     int bufferSize = 1024; /*Number of bytes we receive at same time */
-
-    struct sockaddr_storage obj_addr;
-    void *get_in_addr(struct sockaddr *sa);
+    string Address;
+    int Port;
 
 };
 

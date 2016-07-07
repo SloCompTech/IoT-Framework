@@ -1,18 +1,15 @@
 #include "TCPClient.h"
+TCPClient::TCPClient()
+{
+  this->obj_socket = -1; /* NULL Socket */
+  this->Address = ""; /* No IP address */
+  this->Port = 0; /* NULL Port */
+}
 
 TCPClient::~TCPClient()
 {
   if(this->isValid())
     this->_close();
-}
-
-void *TCPClient::get_in_addr(struct sockaddr *sa)
-{
-    if (sa->sa_family == AF_INET) {
-        return &(((struct sockaddr_in*)sa)->sin_addr);
-    }
-
-    return &(((struct sockaddr_in6*)sa)->sin6_addr);
 }
 
 bool TCPClient::setBlocking(bool pBlocking)
@@ -22,9 +19,12 @@ bool TCPClient::setBlocking(bool pBlocking)
 
 string TCPClient::getAddress()
 {
-  char s[INET6_ADDRSTRLEN];
-  inet_ntop((this->obj_addr).ss_family,get_in_addr((struct sockaddr *)&(this->obj_addr)),s, sizeof s);
-  return (string)s;
+  return this->Address;
+}
+
+int TCPClient::getPort()
+{
+  return this->Port;
 }
 
 bool TCPClient::isOpened()
@@ -37,7 +37,7 @@ bool TCPClient::isValid()
   return ((this->obj_socket) > -1);
 }
 
-bool TCPServer::_connect(string pAddress,int pPort)
+bool TCPClient::_connect(string pAddress,int pPort)
 {
   struct addrinfo hints, *servinfo, *p;
   char port[4];
@@ -78,7 +78,7 @@ bool TCPServer::_connect(string pAddress,int pPort)
 
   }
 
-  this->obj_addr = *servinfo;
+
   freeaddrinfo(servinfo); // all done with this structure
 
   if(p==NULL||!done)
@@ -86,6 +86,9 @@ bool TCPServer::_connect(string pAddress,int pPort)
 
   freeaddrinfo(p);
 
+  /* Add info to porperties of client */
+  this->Address = pAddress;
+  this->Port = pPort;
 
   return true;
 }
@@ -125,6 +128,9 @@ string TCPClient::_receive(int pSize)
 void TCPClient::_close()
 {
   close(this->obj_socket);
+  this->Address = "";
+  this->Port = 0;
+
 }
 
 void TCPClient::setBufferSize(int size)
