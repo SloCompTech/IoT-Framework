@@ -29,6 +29,7 @@ class TCPServerConnection
 
     bool setBlocking(bool pBlocking);
     string getAddress();
+
     bool isValid();
     bool isOpened();
 
@@ -36,6 +37,7 @@ class TCPServerConnection
     bool _send(const char message[]);
 
     string _receive();
+    string _receive(int pSize);
 
     void _close();
 

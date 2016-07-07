@@ -85,12 +85,13 @@ bool TCPServer::_bind(int pPort)
 
   }
 
+  freeaddrinfo(servinfo); // all done with this structure
 
   if(p==NULL||!done)
     return false;
 
-  freeaddrinfo(servinfo); // all done with this structure
-  //freeaddrinfo(p);
+
+  freeaddrinfo(p);
 
 
   return true;

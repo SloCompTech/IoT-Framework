@@ -63,8 +63,27 @@ string TCPServerConnection::_receive()
   else
     return "";
 }
+string TCPServerConnection::_receive(int pSize)
+{
+  char buffer[pSize];
+  if(recv(this->obj_socket, buffer, this->bufferSize, 0)>-1)
+    return (string)buffer;
+  else
+    return "";
+}
 
 void TCPServerConnection::_close()
 {
   close(this->obj_socket);
+}
+
+void TCPServerConnection::setBufferSize(int size)
+{
+  if(size>=1)
+    this->bufferSize = size;
+}
+
+int TCPServerConnection::getBufferSize()
+{
+  return this->bufferSize;
 }
