@@ -8,7 +8,7 @@
 #include <string>
 #include <unistd.h>
 
-#include "SocketManip.h"
+#include <SocketManip/SocketManip.h>
 #include "TCPServerConnection.h"
 #include <Convert/Convert.h>
 

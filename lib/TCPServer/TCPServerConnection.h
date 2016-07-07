@@ -8,7 +8,7 @@
 #include <string>
 #include <cstring>
 
-#include "SocketManip.h"
+#include <SocketManip/SocketManip.h>
 #include <unistd.h>
 
 #ifdef OS_LINUX
