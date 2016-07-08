@@ -52,7 +52,7 @@ int main(int argc,char *argv[])
 
     Log::logDebug((string)"Got connection from: "+conn.getAddress());/* Print IP address of client */
 
-    conn._send("Hello you there, bye :)");
+    conn._send("Wov");
     conn._close();
 
     Log::logDebug((string)"Closed connection with: "+conn.getAddress());/* Print IP address of client */

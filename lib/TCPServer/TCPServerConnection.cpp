@@ -13,6 +13,7 @@ TCPServerConnection::~TCPServerConnection()
 
 bool TCPServerConnection::setBlocking(bool pBlocking)
 {
+  this->blocking = pBlocking;
   return SocketManip::SetSocketBlockingEnabled(this->obj_socket,pBlocking);
 }
 
@@ -57,19 +58,41 @@ bool TCPServerConnection::_send(const char message[])
 }
 string TCPServerConnection::_receive()
 {
-  char buffer[this->bufferSize];
-  if(recv(this->obj_socket, buffer, this->bufferSize, 0)>-1)
+  char buffer[this->bufferSize+1];
+  int len = recv(this->obj_socket, buffer, this->bufferSize, 0);
+  if(len>-1)
+  {
+    buffer[len]='\0';
     return (string)buffer;
+  }
   else
     return "";
 }
 string TCPServerConnection::_receive(int pSize)
 {
-  char buffer[pSize];
-  if(recv(this->obj_socket, buffer, this->bufferSize, 0)>-1)
+  char buffer[pSize+1];
+  int len = recv(this->obj_socket, buffer, pSize, 0);
+  if(len>-1)
+  {
+    buffer[len]='\0';
     return (string)buffer;
+  }
   else
     return "";
+}
+
+void TCPServerConnection::clearBuffer()
+{
+  bool realBlocking = this->blocking;
+  if(realBlocking)
+    this->setBlocking(false);
+
+  while(this->_receive()!="")
+    ;
+
+  if(realBlocking)
+    this->setBlocking(true);
+
 }
 
 void TCPServerConnection::_close()

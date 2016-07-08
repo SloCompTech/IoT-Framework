@@ -90,10 +90,6 @@ bool TCPServer::_bind(int pPort)
   if(p==NULL||!done)
     return false;
 
-
-  freeaddrinfo(p);
-
-
   return true;
 }
 

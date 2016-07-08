@@ -49,12 +49,14 @@ class TCPClient
     void setBufferSize(int size);
     int getBufferSize();
 
+    void clearBuffer();
   private:
     int obj_socket;
     int bufferSize = 1024; /*Number of bytes we receive at same time */
     string Address;
     int Port;
-
+    bool blocking = true;
+    
 };
 
 #endif

@@ -44,11 +44,14 @@ class TCPServerConnection
     void setBufferSize(int size);
     int getBufferSize();
 
+    void clearBuffer();
+
   private:
     int obj_socket;
     int bufferSize=1024; /* Number of bytes we can receive at once */
     struct sockaddr_storage obj_addr;
     void *get_in_addr(struct sockaddr *sa);
+    bool blocking = true;
 };
 
 #endif

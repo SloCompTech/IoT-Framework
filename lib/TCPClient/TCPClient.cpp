@@ -14,6 +14,7 @@ TCPClient::~TCPClient()
 
 bool TCPClient::setBlocking(bool pBlocking)
 {
+  this->blocking = pBlocking;
   return SocketManip::SetSocketBlockingEnabled(this->obj_socket,pBlocking);
 }
 
@@ -84,7 +85,6 @@ bool TCPClient::_connect(string pAddress,int pPort)
   if(p==NULL||!done)
     return false;
 
-  freeaddrinfo(p);
 
   /* Add info to porperties of client */
   this->Address = pAddress;
@@ -110,19 +110,40 @@ bool TCPClient::_send(const char message[])
 }
 string TCPClient::_receive()
 {
-  char buffer[this->bufferSize];
-  if(recv(this->obj_socket, buffer, this->bufferSize, 0)>-1)
+  char buffer[this->bufferSize+1];
+  int len = recv(this->obj_socket, buffer, this->bufferSize, 0);
+  if(len>-1)
+  {
+    buffer[len]='\0';
     return (string)buffer;
+  }
   else
     return "";
 }
 string TCPClient::_receive(int pSize)
 {
-  char buffer[pSize];
-  if(recv(this->obj_socket, buffer, this->bufferSize, 0)>-1)
+  char buffer[pSize+1];
+  int len = recv(this->obj_socket, buffer, pSize, 0);
+  if(len>-1)
+  {
+    buffer[len]='\0';
     return (string)buffer;
+  }
   else
     return "";
+}
+
+void TCPClient::clearBuffer()
+{
+  bool realBlocking = this->blocking;
+  if(realBlocking)
+    this->setBlocking(false);
+
+  while(this->_receive()!="")
+    ;
+
+  if(realBlocking)
+    this->setBlocking(true);
 }
 
 void TCPClient::_close()
