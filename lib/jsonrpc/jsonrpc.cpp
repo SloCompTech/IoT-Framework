@@ -1,4 +1,8 @@
 #include "jsonrpc.h"
+JsonRPC::JsonRPC(string pVersion)
+{
+  this->setVersion(pVersion);
+}
 
 bool JsonRPC::parse(string pText)
 {
