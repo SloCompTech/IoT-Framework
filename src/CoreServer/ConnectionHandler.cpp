@@ -25,7 +25,6 @@ bool ConnectionHandler::exec()
         tmp = this->connection._receive();
         message+=tmp;
       }while(tmp!=""); /* If we get longer message than we can grab at one time */
-      this->connection._send(message); /* TODO Remove */
 
       if(this->receiveCallback!=NULL)
         this->receiveCallback(this,message);
