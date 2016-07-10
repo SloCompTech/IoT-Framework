@@ -43,6 +43,8 @@ class TCPClient
 
     string _receive();
     string _receive(int pSize);
+    int _receive(string &pString); /* Returns length of message */
+    int _receive(int pSize,string &pString); /* Returns length of message */
 
     void _close();
 
@@ -50,13 +52,16 @@ class TCPClient
     int getBufferSize();
 
     void clearBuffer();
+
+    void setSafeMode(bool pMode);
+    bool getSafeMode();
   private:
     int obj_socket;
     int bufferSize = 1024; /*Number of bytes we receive at same time */
     string Address;
     int Port;
     bool blocking = true;
-    
+    bool safeMode = false;
 };
 
 #endif

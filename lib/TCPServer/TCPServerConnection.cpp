@@ -1,5 +1,10 @@
 #include "TCPServerConnection.h"
 
+TCPServerConnection::TCPServerConnection()
+{
+
+}
+
 TCPServerConnection::TCPServerConnection(int pSocket,struct sockaddr_storage pSa)
 {
     this->obj_socket = pSocket;
@@ -7,7 +12,7 @@ TCPServerConnection::TCPServerConnection(int pSocket,struct sockaddr_storage pSa
 }
 TCPServerConnection::~TCPServerConnection()
 {
-  if(this->isValid())
+  if(this->safeMode&&this->isValid())
     this->_close();
 }
 
@@ -29,7 +34,7 @@ void *TCPServerConnection::get_in_addr(struct sockaddr *sa)
 string TCPServerConnection::getAddress()
 {
   char s[INET6_ADDRSTRLEN];
-  inet_ntop((this->obj_addr).ss_family,get_in_addr((struct sockaddr *)&(this->obj_addr)),s, sizeof s);
+  inet_ntop((this->obj_addr).ss_family,get_in_addr((struct sockaddr *)&(obj_addr)),s, sizeof(s));
   return (string)s;
 }
 bool TCPServerConnection::isOpened()
@@ -44,6 +49,9 @@ bool TCPServerConnection::isValid()
 
 bool TCPServerConnection::_send(string message)
 {
+  if(!this->isValid())
+    return false;
+
   if(send(this->obj_socket,message.c_str(),message.size(),0)>-1)
     return true;
   else
@@ -51,6 +59,9 @@ bool TCPServerConnection::_send(string message)
 }
 bool TCPServerConnection::_send(const char message[])
 {
+  if(!this->isValid())
+    return false;
+
   if(send(this->obj_socket,message,strlen(message),0)>-1)
     return true;
   else
@@ -58,6 +69,9 @@ bool TCPServerConnection::_send(const char message[])
 }
 string TCPServerConnection::_receive()
 {
+  if(!this->isValid())
+    return "";
+
   char buffer[this->bufferSize+1];
   int len = recv(this->obj_socket, buffer, this->bufferSize, 0);
   if(len>-1)
@@ -79,6 +93,38 @@ string TCPServerConnection::_receive(int pSize)
   }
   else
     return "";
+}
+int TCPServerConnection::_receive(string &pString)
+{
+  if(!this->isValid())
+    return -1;
+
+  char buffer[this->bufferSize+1];
+  int len = recv(this->obj_socket, buffer, this->bufferSize, 0);
+  if(len>-1)
+  {
+    buffer[len]='\0';
+    pString = (string)buffer;
+    return len;
+  }
+  else
+    return -1;
+}
+int TCPServerConnection::_receive(int pSize,string &pString)
+{
+  if(!this->isValid())
+    return -1;
+
+  char buffer[pSize+1];
+  int len = recv(this->obj_socket, buffer, pSize, 0);
+  if(len>-1)
+  {
+    buffer[len]='\0';
+    pString = (string)buffer;
+    return len;
+  }
+  else
+    return -1;
 }
 
 void TCPServerConnection::clearBuffer()
@@ -109,4 +155,12 @@ void TCPServerConnection::setBufferSize(int size)
 int TCPServerConnection::getBufferSize()
 {
   return this->bufferSize;
+}
+void TCPServerConnection::setSafeMode(bool pMode)
+{
+  this->safeMode = pMode;
+}
+bool TCPServerConnection::getSafeMode()
+{
+  return this->safeMode;
 }

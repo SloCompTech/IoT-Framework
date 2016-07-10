@@ -8,8 +8,8 @@ TCPClient::TCPClient()
 
 TCPClient::~TCPClient()
 {
-  if(this->isValid())
-    this->_close();
+  /*if(this->isValid())
+    this->_close();*/
 }
 
 bool TCPClient::setBlocking(bool pBlocking)
@@ -133,6 +133,40 @@ string TCPClient::_receive(int pSize)
     return "";
 }
 
+int TCPClient::_receive(string &pString)
+{
+  if(!this->isValid())
+    return -1;
+
+  char buffer[this->bufferSize+1];
+  int len = recv(this->obj_socket, buffer, this->bufferSize, 0);
+  if(len>-1)
+  {
+    buffer[len]='\0';
+    pString = (string)buffer;
+    return len;
+  }
+  else
+    return -1;
+}
+int TCPClient::_receive(int pSize,string &pString)
+{
+  if(!this->isValid())
+    return -1;
+
+  char buffer[pSize+1];
+  int len = recv(this->obj_socket, buffer, pSize, 0);
+  if(len>-1)
+  {
+    buffer[len]='\0';
+    pString = (string)buffer;
+    return len;
+  }
+  else
+    return -1;
+}
+
+
 void TCPClient::clearBuffer()
 {
   bool realBlocking = this->blocking;
@@ -163,4 +197,13 @@ void TCPClient::setBufferSize(int size)
 int TCPClient::getBufferSize()
 {
   return this->bufferSize;
+}
+
+void TCPClient::setSafeMode(bool pMode)
+{
+  this->safeMode = pMode;
+}
+bool TCPClient::getSafeMode()
+{
+  return this->safeMode;
 }

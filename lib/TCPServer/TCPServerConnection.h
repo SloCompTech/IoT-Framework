@@ -7,6 +7,7 @@
 
 #include <string>
 #include <cstring>
+#include <iostream>
 
 #include <SocketManip/SocketManip.h>
 #include <unistd.h>
@@ -24,6 +25,7 @@ using namespace std;
 class TCPServerConnection
 {
   public:
+    TCPServerConnection();
     TCPServerConnection(int pSocket,struct sockaddr_storage pSa);
     ~TCPServerConnection();
 
@@ -38,6 +40,8 @@ class TCPServerConnection
 
     string _receive();
     string _receive(int pSize);
+    int _receive(string &pString); /* Returns length of message */
+    int _receive(int pSize,string &pString); /* Returns length of message */
 
     void _close();
 
@@ -46,12 +50,16 @@ class TCPServerConnection
 
     void clearBuffer();
 
+    void setSafeMode(bool pMode); /* If true, when constructor is called close socket */
+    bool getSafeMode();
+
   private:
     int obj_socket;
     int bufferSize=1024; /* Number of bytes we can receive at once */
     struct sockaddr_storage obj_addr;
     void *get_in_addr(struct sockaddr *sa);
     bool blocking = true;
+    bool safeMode = false;
 };
 
 #endif

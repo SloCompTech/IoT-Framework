@@ -40,10 +40,12 @@ class TCPServer
 
     void _close();
 
+    void setSafeMode(bool pMode);
+    bool getSafeMode();
   private:
     int obj_socket;
     int pendingConnections = 10; //Number of pending connection to hold
-
+    bool safeMode = true;
 };
 
 

@@ -2,7 +2,7 @@
 
 TCPServer::~TCPServer()
 {
-  if(this->isOpened())
+  if(this->safeMode&&this->isOpened())
     this->_close();
 }
 
@@ -111,4 +111,12 @@ TCPServerConnection TCPServer::_accept()
 void TCPServer::_close()
 {
   close(this->obj_socket);
+}
+void TCPServer::setSafeMode(bool pMode)
+{
+  this->safeMode = pMode;
+}
+bool TCPServer::getSafeMode()
+{
+  return this->safeMode;
 }
