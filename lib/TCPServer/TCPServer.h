@@ -42,6 +42,8 @@ class TCPServer
 
     void setSafeMode(bool pMode);
     bool getSafeMode();
+
+    string getHostname();
   private:
     int obj_socket;
     int pendingConnections = 10; //Number of pending connection to hold

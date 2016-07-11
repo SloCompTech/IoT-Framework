@@ -5,10 +5,9 @@ TCPServerConnection::TCPServerConnection()
 
 }
 
-TCPServerConnection::TCPServerConnection(int pSocket,struct sockaddr_storage pSa)
+TCPServerConnection::TCPServerConnection(int pSocket)
 {
     this->obj_socket = pSocket;
-    this->obj_addr = pSa;
 }
 TCPServerConnection::~TCPServerConnection()
 {
@@ -22,21 +21,47 @@ bool TCPServerConnection::setBlocking(bool pBlocking)
   return SocketManip::SetSocketBlockingEnabled(this->obj_socket,pBlocking);
 }
 
-void *TCPServerConnection::get_in_addr(struct sockaddr *sa)
-{
-    if (sa->sa_family == AF_INET) {
-        return &(((struct sockaddr_in*)sa)->sin_addr);
-    }
 
-    return &(((struct sockaddr_in6*)sa)->sin6_addr);
+
+struct Net::Socket::SocketInfo TCPServerConnection::getInfo()
+{
+  struct Net::Socket::SocketInfo sinfo;
+  if(!this->isValid())
+    return sinfo;
+
+  socklen_t len;
+  struct sockaddr_storage addr;
+  char ipstr[INET6_ADDRSTRLEN];
+  int port;
+  len = sizeof(addr);
+  getpeername(this->obj_socket, (struct sockaddr*)&addr, &len);
+
+  // deal with both IPv4 and IPv6:
+  if (addr.ss_family == AF_INET) {
+      struct sockaddr_in *s = (struct sockaddr_in *)&addr;
+      port = ntohs(s->sin_port);
+      inet_ntop(AF_INET, &s->sin_addr, ipstr, sizeof ipstr);
+  } else { // AF_INET6
+      struct sockaddr_in6 *s = (struct sockaddr_in6 *)&addr;
+      port = ntohs(s->sin6_port);
+      inet_ntop(AF_INET6, &s->sin6_addr, ipstr, sizeof ipstr);
+  }
+
+  sinfo.address = (string)ipstr;
+  sinfo.port = port;
+
+  return sinfo;
 }
 
 string TCPServerConnection::getAddress()
 {
-  char s[INET6_ADDRSTRLEN];
-  inet_ntop((this->obj_addr).ss_family,get_in_addr((struct sockaddr *)&(obj_addr)),s, sizeof(s));
-  return (string)s;
+  return this->getInfo().address;
 }
+int TCPServerConnection::getPort()
+{
+  return this->getInfo().port;
+}
+
 bool TCPServerConnection::isOpened()
 {
   return this->isValid();

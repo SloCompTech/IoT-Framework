@@ -56,12 +56,6 @@ int main(int argc,char *argv[])
   Log::logDebug("Listening ...");
   while(!TERMNINATE)
   {
-  /*  TCPServerConnection* conn = new TCPServerConnection(server._accept());
-    if(!conn->isValid())
-    {
-      delete conn;
-      continue;
-    }*/
     ConnectionHandler* ch = new ConnectionHandler(*(new TCPServerConnection(server._accept())));
     if(!ch->getConnection().isValid())
     {
@@ -70,7 +64,7 @@ int main(int argc,char *argv[])
     }
     Log::logDebug((string)"Got connection from: "+ch->getConnection().getAddress());/* Print IP address of client */
 
-    //ConnectionHandler* ch = new ConnectionHandler(*conn);
+
     ch->setReceiveCallback(receive_message);
     clients.push_back(*ch);
 

@@ -102,8 +102,9 @@ TCPServerConnection TCPServer::_accept()
 {
   socklen_t sin_size;
   struct sockaddr_storage their_addr;
+  sin_size = sizeof(sin_size);
   int socket = accept(this->obj_socket, (struct sockaddr *)&their_addr, &sin_size);
-  TCPServerConnection servConn(socket,their_addr);
+  TCPServerConnection servConn(socket);
   return servConn;
 }
 
@@ -119,4 +120,12 @@ void TCPServer::setSafeMode(bool pMode)
 bool TCPServer::getSafeMode()
 {
   return this->safeMode;
+}
+
+
+string TCPServer::getHostname()
+{
+  char hostname[128];
+  gethostname(hostname, sizeof hostname);
+  return (string)hostname;
 }

@@ -12,6 +12,7 @@
 
 #include <SocketManip/SocketManip.h>
 #include <Convert/Convert.h>
+#include <Net/Net.h>
 
 #ifdef OS_LINUX
   #include <netinet/in.h>
@@ -30,6 +31,7 @@ class TCPClient
     ~TCPClient();
 
     bool setBlocking(bool pBlocking);
+    struct Net::Socket::SocketInfo getInfo();
     string getAddress();
     int getPort();
 
@@ -58,8 +60,6 @@ class TCPClient
   private:
     int obj_socket;
     int bufferSize = 1024; /*Number of bytes we receive at same time */
-    string Address;
-    int Port;
     bool blocking = true;
     bool safeMode = false;
 };

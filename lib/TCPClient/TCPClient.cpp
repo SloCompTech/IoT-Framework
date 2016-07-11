@@ -2,14 +2,12 @@
 TCPClient::TCPClient()
 {
   this->obj_socket = -1; /* NULL Socket */
-  this->Address = ""; /* No IP address */
-  this->Port = 0; /* NULL Port */
 }
 
 TCPClient::~TCPClient()
 {
-  /*if(this->isValid())
-    this->_close();*/
+  if(this->isValid()&&this->safeMode)
+    this->_close();
 }
 
 bool TCPClient::setBlocking(bool pBlocking)
@@ -18,14 +16,44 @@ bool TCPClient::setBlocking(bool pBlocking)
   return SocketManip::SetSocketBlockingEnabled(this->obj_socket,pBlocking);
 }
 
-string TCPClient::getAddress()
+struct Net::Socket::SocketInfo TCPClient::getInfo()
 {
-  return this->Address;
+  struct Net::Socket::SocketInfo sinfo;
+  if(!this->isValid())
+    return sinfo;
+
+  socklen_t len;
+  struct sockaddr_storage addr;
+  char ipstr[INET6_ADDRSTRLEN];
+  int port;
+  len = sizeof(addr);
+  getpeername(this->obj_socket, (struct sockaddr*)&addr, &len);
+
+  // deal with both IPv4 and IPv6:
+  if (addr.ss_family == AF_INET) {
+      struct sockaddr_in *s = (struct sockaddr_in *)&addr;
+      port = ntohs(s->sin_port);
+      inet_ntop(AF_INET, &s->sin_addr, ipstr, sizeof ipstr);
+  } else { // AF_INET6
+      struct sockaddr_in6 *s = (struct sockaddr_in6 *)&addr;
+      port = ntohs(s->sin6_port);
+      inet_ntop(AF_INET6, &s->sin6_addr, ipstr, sizeof ipstr);
+  }
+
+
+  sinfo.address = (string)ipstr;
+  sinfo.port = port;
+
+  return sinfo;
 }
 
+string TCPClient::getAddress()
+{
+  return this->getInfo().address;
+}
 int TCPClient::getPort()
 {
-  return this->Port;
+  return this->getInfo().port;
 }
 
 bool TCPClient::isOpened()
@@ -84,11 +112,6 @@ bool TCPClient::_connect(string pAddress,int pPort)
 
   if(p==NULL||!done)
     return false;
-
-
-  /* Add info to porperties of client */
-  this->Address = pAddress;
-  this->Port = pPort;
 
   return true;
 }
@@ -183,8 +206,6 @@ void TCPClient::clearBuffer()
 void TCPClient::_close()
 {
   close(this->obj_socket);
-  this->Address = "";
-  this->Port = 0;
 
 }
 

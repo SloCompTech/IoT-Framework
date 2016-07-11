@@ -10,6 +10,8 @@
 #include <iostream>
 
 #include <SocketManip/SocketManip.h>
+#include <Net/Net.h>
+
 #include <unistd.h>
 
 #ifdef OS_LINUX
@@ -26,11 +28,13 @@ class TCPServerConnection
 {
   public:
     TCPServerConnection();
-    TCPServerConnection(int pSocket,struct sockaddr_storage pSa);
+    TCPServerConnection(int pSocket);
     ~TCPServerConnection();
 
     bool setBlocking(bool pBlocking);
+    struct Net::Socket::SocketInfo getInfo();
     string getAddress();
+    int getPort();
 
     bool isValid();
     bool isOpened();
@@ -56,8 +60,6 @@ class TCPServerConnection
   private:
     int obj_socket;
     int bufferSize=1024; /* Number of bytes we can receive at once */
-    struct sockaddr_storage obj_addr;
-    void *get_in_addr(struct sockaddr *sa);
     bool blocking = true;
     bool safeMode = false;
 };
