@@ -3,8 +3,8 @@
 
 #include <iostream>
 #include <string>
-#include <json/json.h>
-#include <json/json-forwards.h>
+#include <jsoncpp/dist/json/json.h>
+#include <jsoncpp/dist/json/json-forwards.h>
 
 using namespace std;
 
@@ -21,6 +21,7 @@ class JsonRPC
       Result,
       Error
     };
+    JsonRPC();
     JsonRPC(string pVersion);
 
     bool parse(string pText);
@@ -46,6 +47,7 @@ class JsonRPC
     void setResult(Json::Value pResult);
     Json::Value getResult();
 
+    bool hasError();
     void setErrorCode(int pCode);
     int getErrorCode();
     void setErrorMessage(string pMessage);

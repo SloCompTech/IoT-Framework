@@ -1,4 +1,8 @@
 #include "jsonrpc.h"
+JsonRPC::JsonRPC()
+{
+
+}
 JsonRPC::JsonRPC(string pVersion)
 {
   this->setVersion(pVersion);
@@ -108,6 +112,12 @@ Json::Value JsonRPC::getResult()
 {
   return this->root["result"];
 }
+
+bool JsonRPC::hasError()
+{
+  return (!this->root["error"].isNull());
+}
+
 void JsonRPC::setErrorCode(int pCode)
 {
   this->root["error"]["code"] = pCode;
@@ -142,10 +152,11 @@ Json::Value JsonRPC::getErrorData()
 
 void JsonRPC::print()
 {
-  cout << this->root << endl;
+  cout << this->str() << endl;
 }
 
 string JsonRPC::str()
 {
-  return this->root.asString();
+  Json::FastWriter fastWriter;
+  return fastWriter.write(this->root);
 }
