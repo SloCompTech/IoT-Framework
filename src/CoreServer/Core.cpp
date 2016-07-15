@@ -7,11 +7,16 @@
 
 #include <csignal>
 #include <cstdlib>
+#include <cstdio>
 
 #include <TCPServer/TCPServer.h>
 #include <TCPServer/TCPServerConnection.h>
 #include <ProcessManip/ProcessManip.h>
 #include <Log/Log.h>
+
+#include <jsonrpc/jsonrpc.h>
+#include <jsoncpp/dist/json/json.h>
+#include <jsoncpp/dist/json/json-forwards.h>
 
 #include "ConnectionHandler.h"
 
@@ -23,7 +28,9 @@ vector<ConnectionHandler> clients;
 //Proto
 void terminate(int sig);
 void receive_message(ConnectionHandler *handler,string message);
+void process_cmd(ConnectionHandler *handler,string message);
 void tcp_worker();
+void printstring(string text);
 
 using namespace std;
 
@@ -98,8 +105,66 @@ void terminate(int sig)
 
 void receive_message(ConnectionHandler *handler,string message)
 {
-  Log::logDebug((string)"Message ("+handler->getConnection().getAddress()+") : "+message);
-  handler->getConnection()._send(message); /* Repeat message */
+
+
+
+  if(message!="\n"&&message!="\n\r"&&message!=""&&message!="\r\n")
+  {
+    Log::logDebug((string)"Message ("+handler->getConnection().getAddress()+") : "+message);
+    process_cmd(handler,message);
+  }
+  else
+  {
+    Log::logDebug((string)"Message ("+handler->getConnection().getAddress()+") : <empty message>");
+    printstring(message);
+  }
+
+  //handler->getConnection()._send(message); /* Repeat message */
+}
+
+void process_cmd(ConnectionHandler *handler,string message)
+{
+  JsonRPC json;
+  JsonRPC response("2.0");
+
+  try
+  {
+    if(json.parse(message))
+    {
+      int type = json.getType();
+      if(type!=JsonRPC::Type::None)
+      {
+        handler->getConnection()._send(message); /* Repeat message */
+      }
+      else
+      {
+        //Invalid RPC request
+        response.setErrorCode(-32600);
+        response.setErrorMessage("Invalid request");
+        handler->getConnection()._send(response.str()+"\r\n");
+      }
+    }
+    else
+    {
+        //Parse error
+        response.setErrorCode(-32700);
+        response.setErrorMessage("Parse error");
+        handler->getConnection()._send(response.str()+"\r\n");
+    }
+  }catch (Json::LogicError e){
+    cout << e.what() << endl;
+    //Parse error
+    try
+    {
+      response.setErrorCode(-32000);
+      response.setErrorMessage((string)e.what());
+      handler->getConnection()._send(response.str()+"\r\n");
+    }catch(Json::LogicError e){
+      cout << e.what()<<endl;
+    }
+
+  }
+
 }
 
 void tcp_worker()
@@ -129,4 +194,33 @@ void tcp_worker()
     }
   }
   Log::logDebug("Stopped TCP worker");
+}
+
+void printstring(string text)
+{
+    char chr;
+    for(int i=0;i<text.size();i++)
+    {
+      chr = text.at(i);
+      switch (chr)
+      {
+          case '\n':
+              printf("\\n\n");
+              break;
+          case '\r':
+              printf("\\r");
+              break;
+          case '\t':
+              printf("\\t");
+              break;
+          default:
+              if ((chr < 0x20) || (chr > 0x7f)) {
+                  printf("\\%03o", (unsigned char)chr);
+              } else {
+                  printf("%c", chr);
+              }
+          break;
+     }
+    }
+
 }
