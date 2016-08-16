@@ -1,5 +1,5 @@
-LIB_DIR = ../../lib
-INCLUDE_DIR = ../../lib
+LIB_DIR = ../../
+INCLUDE_DIR = ../../
 MAIN_CPP=Server.cpp
 OUTPUT_FILE=Server
 
