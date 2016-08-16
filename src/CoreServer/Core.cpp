@@ -106,8 +106,6 @@ void terminate(int sig)
 void receive_message(ConnectionHandler *handler,string message)
 {
 
-
-
   if(message!="\n"&&message!="\n\r"&&message!=""&&message!="\r\n")
   {
     Log::logDebug((string)"Message ("+handler->getConnection().getAddress()+") : "+message);
@@ -119,7 +117,6 @@ void receive_message(ConnectionHandler *handler,string message)
     printstring(message);
   }
 
-  //handler->getConnection()._send(message); /* Repeat message */
 }
 
 void process_cmd(ConnectionHandler *handler,string message)
@@ -134,6 +131,21 @@ void process_cmd(ConnectionHandler *handler,string message)
       int type = json.getType();
       if(type!=JsonRPC::Type::None)
       {
+        string method = json.getMethod();
+        Json::Value params = json.getParams();
+
+        if(method == "auth")
+        {
+          // Authentication (key (on-boot) or token)
+
+        }
+        else if(method == "storeval")
+        {
+          // Store value in db
+
+        }
+
+
         handler->getConnection()._send(message); /* Repeat message */
       }
       else

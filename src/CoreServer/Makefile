@@ -1,10 +1,14 @@
-LIB_DIR = ../../lib
-INCLUDE_DIR = ../../lib
-MAIN_CPP=Core.cpp
-FILE_CPP=ConnectionHandler.cpp
-OUTPUT_FILE=Core
-LIB_CPP = $(LIB_DIR)/jsoncpp/dist/jsoncpp.o
-BINARY_FILES = $(wildcard ../../lib/*.o) $(wildcard ../../lib/*/*.o)
+# Variables from main make:
+# 	DIR_LIB_C
+
+DIR_LIB_C = ../../lib/C
+
+
+LIB_CPP = $(DIR_LIB_C)/jsoncpp/dist/jsoncpp.o
+BINARY_FILES = $(wildcard $(DIR_LIB_C)/*.o) $(wildcard $(DIR_LIB_C)/*/*.o)
+
+
 
 build:
-	g++ $(MAIN_CPP)  $(FILE_CPP) $(BINARY_FILES) $(LIB_CPP) -I $(INCLUDE_DIR) -std=c++11 -o $(OUTPUT_FILE) -pthread
+	echo $(OUTPUT)
+	g++ *.cpp $(BINARY_FILES) $(LIB_CPP) -I $(DIR_LIB_C) -std=c++11 -o $(OUTPUT) -pthread
