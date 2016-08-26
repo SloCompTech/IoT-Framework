@@ -19,11 +19,13 @@
 #include <jsoncpp/dist/json/json-forwards.h>
 
 #include "ConnectionHandler.h"
+#include "DBDriver.h"
 
 //Global
 bool TERMNINATE = false;//If true loops must end
 const int PORT = 8822;
 vector<ConnectionHandler> clients;
+DBDriver dbi;
 
 //Proto
 void terminate(int sig);
@@ -43,6 +45,17 @@ int main(int argc,char *argv[])
   Log::logDebug("Starting ...");
 
   //Init
+  Log::logDebug("Connecting to DB ...");
+  dbi.db.setCredentials("127.0.0.1","IoT-framework","root","root");
+  if(!dbi.db.connect())
+    return -1;
+  if(!dbi.db.isConnected())
+  {
+    dbi.db.disconnect();
+    return -2;
+  }
+  Log::logDebug("Conencted to DB");
+
   thread t_tcpworker(tcp_worker);
 
   //Init modules
@@ -91,9 +104,14 @@ int main(int argc,char *argv[])
       it = clients.erase(it); /* Delete ConnectionHandler from vector */
   }
 
+  Log::logDebug("Closing server");
   server._close();
+  Log::logDebug("Server closed");
 
-  Log::logDebug("Closed");
+  Log::logDebug("Disconnecting from DB");
+  dbi.db.disconnect();
+  Log::logDebug("Disconnected from DB");
+
   return 0;
 }
 
@@ -103,7 +121,7 @@ void terminate(int sig)
   TERMNINATE = true;
 }
 
-void receive_message(ConnectionHandler *handler,string message)
+void receive_message(ConnectionHandler *handler,string message) /* TCP handler */
 {
 
   if(message!="\n"&&message!="\n\r"&&message!=""&&message!="\r\n")

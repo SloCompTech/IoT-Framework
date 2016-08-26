@@ -5,13 +5,13 @@
 
 #include <vector>
 #include <string>
-
+#include <iostream>
 
 class Database
 {
   public:
 
-    class DatabaseException:public exception
+    class DatabaseException:public std::exception
     {
       public:
         std::string message = "";
@@ -29,8 +29,8 @@ class Database
     };
 
 
-    Databse();
-    ~Databse();
+    Database();
+    ~Database();
 
     void setCredentials(std::string address,std::string name,std::string username,std::string password);
     bool checkCredentials();

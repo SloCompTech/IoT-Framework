@@ -15,7 +15,7 @@ Database::~Database()
 }
 
 // Other
-void Databse::setCredentials(std::string address,std::string name,std::string username,std::string password)
+void Database::setCredentials(std::string address,std::string name,std::string username,std::string password)
 {
   this->DB_ADDR = address;
   this->DB_NAME = name;
@@ -23,7 +23,7 @@ void Databse::setCredentials(std::string address,std::string name,std::string us
   this->DB_PASS = password;
 }
 
-bool Databse::checkCredentials()
+bool Database::checkCredentials()
 {
   if(this->DB_ADDR==""||this->DB_USER==""||this->DB_NAME=="")
     return false;
@@ -31,7 +31,7 @@ bool Databse::checkCredentials()
   return true;
 }
 
-bool Databse::connect()
+bool Database::connect()
 {
   if(this->mysql_link == NULL)
 	{
@@ -75,7 +75,7 @@ bool Database::isConnected()
   if(this->mysql_link == NULL)
 		return false;
 
-	string info(mysql_stat(this->mysql_link));
+	std::string info(mysql_stat(this->mysql_link));
 	if(info=="")
 	{
 		mysql_close(this->mysql_link);
@@ -96,7 +96,7 @@ bool Database::disconnect()
 	return false;
 }
 
-bool Databse::testConnection()
+bool Database::testConnection()
 {
   if(!this->checkCredentials())
     return false;
@@ -118,7 +118,7 @@ std::string Database::parse(std::string str)
   {
 		char *tmp = new char[(str.length() * 2) + 1]; //Double size because special chars
 		mysql_real_escape_string(mysql_link,tmp,str.c_str(),str.length());
-		string res(tmp);
+		std::string res(tmp);
 		delete tmp;
 		return res;
 	}else{
@@ -126,7 +126,7 @@ std::string Database::parse(std::string str)
 	}
 	return "";
 }
-bool Databse::execNonQuery(std::string sql_cmd)
+bool Database::execNonQuery(std::string sql_cmd)
 {
   if(this->mysql_link!=NULL)
   {

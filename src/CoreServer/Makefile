@@ -11,4 +11,4 @@ BINARY_FILES = $(wildcard $(DIR_LIB_C)/*.o) $(wildcard $(DIR_LIB_C)/*/*.o)
 
 build:
 	echo $(OUTPUT)
-	g++ *.cpp $(BINARY_FILES) $(LIB_CPP) -I $(DIR_LIB_C) -std=c++11 -o $(OUTPUT) -pthread
+	g++ *.cpp $(BINARY_FILES) $(LIB_CPP) -I $(DIR_LIB_C) -std=c++11 $$(mysql_config --cflags) -o $(OUTPUT) $$(mysql_config --libs) -pthread
